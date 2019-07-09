@@ -29,7 +29,7 @@ mapOptional ::
   (a -> b)
   -> Optional a
   -> Optional b
-mapOptional f Empty = Empty
+mapOptional _ Empty = Empty
 mapOptional f (Full a) = Full (f a)
 
 -- mapOptional is the fmap of Optional
@@ -84,8 +84,9 @@ bindOptional f (Full a) = f a
   Optional a
   -> Optional a
   -> Optional a
-(<+>) =
-  error "todo: Course.Optional#(<+>)"
+(<+>) (Full a) _ = Full a
+(<+>) _ x = x
+
 
 -- | Replaces the Full and Empty constructors in an optional.
 --
@@ -99,8 +100,8 @@ optional ::
   -> b
   -> Optional a
   -> b
-optional =
-  error "todo: Course.Optional#optional"
+optional f _ (Full a) = f a
+optional _ b Empty = b
 
 applyOptional :: Optional (a -> b) -> Optional a -> Optional b
 applyOptional f a = bindOptional (\f' -> mapOptional f' a) f
