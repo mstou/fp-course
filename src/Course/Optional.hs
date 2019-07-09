@@ -16,6 +16,8 @@ data Optional a =
   | Empty
   deriving (Eq, Show)
 
+-- Definition & Implementation of Maybe
+
 -- | Map the given function on the possible value.
 --
 -- >>> mapOptional (+1) Empty
@@ -27,8 +29,10 @@ mapOptional ::
   (a -> b)
   -> Optional a
   -> Optional b
-mapOptional =
-  error "todo: Course.Optional#mapOptional"
+mapOptional f Empty = Empty
+mapOptional f (Full a) = Full (f a)
+
+-- mapOptional is the fmap of Optional
 
 -- | Bind the given function on the possible value.
 --
@@ -44,8 +48,8 @@ bindOptional ::
   (a -> Optional b)
   -> Optional a
   -> Optional b
-bindOptional =
-  error "todo: Course.Optional#bindOptional"
+bindOptional _ Empty = Empty
+bindOptional f (Full a) = f a
 
 -- | Return the possible value if it exists; otherwise, the second argument.
 --
@@ -54,12 +58,13 @@ bindOptional =
 --
 -- >>> Empty ?? 99
 -- 99
+
 (??) ::
   Optional a
   -> a
   -> a
-(??) =
-  error "todo: Course.Optional#(??)"
+(??) Empty a = a
+(??) (Full a) _ = a
 
 -- | Try the first optional for a value. If it has a value, use it; otherwise,
 -- use the second value.

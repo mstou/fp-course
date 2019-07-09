@@ -75,8 +75,8 @@ headOr ::
   a
   -> List a
   -> a
-headOr =
-  error "todo: Course.List#headOr"
+headOr x Nil = x
+headOr _ (h :. _) = h
 
 -- | The product of the elements of a list.
 --
@@ -92,7 +92,10 @@ product ::
   List Int
   -> Int
 product =
-  error "todo: Course.List#product"
+  foldLeft (*) 1
+
+-- product Nil = 1
+-- product (h :. t) = h * product t
 
 -- | Sum the elements of the list.
 --
@@ -107,7 +110,12 @@ sum ::
   List Int
   -> Int
 sum =
-  error "todo: Course.List#sum"
+  foldLeft
+    (+)
+    0
+
+-- sum Nil = 0
+-- sum (h :. t) = h + sum t
 
 -- | Return the length of the list.
 --
@@ -118,8 +126,18 @@ sum =
 length ::
   List a
   -> Int
+
 length =
-  error "todo: Course.List#length"
+  foldLeft
+    (const . (+1))
+    0
+
+  -- foldLeft
+  --   (\acc _ -> acc + 1)
+  --   0
+
+-- length Nil = 0
+-- length (_ :. t) = 1 + length t
 
 -- | Map the given function on each element of the list.
 --
@@ -133,8 +151,18 @@ map ::
   (a -> b)
   -> List a
   -> List b
-map =
-  error "todo: Course.List#map"
+map f =
+  foldRight
+    ((:.) . f)
+    Nil
+
+-- map f =
+--   foldRight
+--   (\x acc -> f x :. acc)
+--   Nil
+
+-- map _ Nil = Nil
+-- map f (h :. t) = f h :. (map f t)
 
 -- | Return elements satisfying the given predicate.
 --
@@ -150,8 +178,10 @@ filter ::
   (a -> Bool)
   -> List a
   -> List a
-filter =
-  error "todo: Course.List#filter"
+filter _ Nil = Nil
+filter p (h :. t) =
+  let remainingList = filter p t
+      in if p h then h :. remainingList else remainingList
 
 -- | Append two lists to a new list.
 --
@@ -169,8 +199,9 @@ filter =
   List a
   -> List a
   -> List a
-(++) =
-  error "todo: Course.List#(++)"
+(++) Nil l = l
+(++) l Nil = l
+(++) (h1 :. t1) l2 = h1 :. (t1 ++ l2)
 
 infixr 5 ++
 
@@ -187,8 +218,8 @@ infixr 5 ++
 flatten ::
   List (List a)
   -> List a
-flatten =
-  error "todo: Course.List#flatten"
+flatten Nil = Nil
+flatten (h :. t) = h ++ flatten t
 
 -- | Map a function then flatten to a list.
 --
@@ -204,8 +235,8 @@ flatMap ::
   (a -> List b)
   -> List a
   -> List b
-flatMap =
-  error "todo: Course.List#flatMap"
+flatMap _ Nil = Nil
+flatMap f (h :. t) = f h ++ flatMap f t
 
 -- | Flatten a list of lists to a list (again).
 -- HOWEVER, this time use the /flatMap/ function that you just wrote.
@@ -214,8 +245,7 @@ flatMap =
 flattenAgain ::
   List (List a)
   -> List a
-flattenAgain =
-  error "todo: Course.List#flattenAgain"
+flattenAgain = flatten
 
 -- | Convert a list of optional values to an optional list of values.
 --
