@@ -75,8 +75,8 @@ headOr ::
   a
   -> List a
   -> a
-headOr x Nil = x
-headOr _ (h :. _) = h
+headOr a Nil = a
+headOr _ (x :. _) = x
 
 -- | The product of the elements of a list.
 --
@@ -92,10 +92,9 @@ product ::
   List Int
   -> Int
 product =
-  foldLeft (*) 1
-
--- product Nil = 1
--- product (h :. t) = h * product t
+  foldLeft
+    (*)
+    1
 
 -- | Sum the elements of the list.
 --
@@ -113,10 +112,6 @@ sum =
   foldLeft
     (+)
     0
-
--- sum Nil = 0
--- sum (h :. t) = h + sum t
-
 -- | Return the length of the list.
 --
 -- >>> length (1 :. 2 :. 3 :. Nil)
@@ -126,18 +121,11 @@ sum =
 length ::
   List a
   -> Int
-
 length =
   foldLeft
     (const . (+1))
+    -- (\acc _ -> acc + 1)
     0
-
-  -- foldLeft
-  --   (\acc _ -> acc + 1)
-  --   0
-
--- length Nil = 0
--- length (_ :. t) = 1 + length t
 
 -- | Map the given function on each element of the list.
 --
@@ -154,15 +142,8 @@ map ::
 map f =
   foldRight
     ((:.) . f)
+    -- (\x acc -> (f x) :. acc)
     Nil
-
--- map f =
---   foldRight
---   (\x acc -> f x :. acc)
---   Nil
-
--- map _ Nil = Nil
--- map f (h :. t) = f h :. (map f t)
 
 -- | Return elements satisfying the given predicate.
 --
@@ -178,18 +159,11 @@ filter ::
   (a -> Bool)
   -> List a
   -> List a
-
-filter p l =
+filter p =
   foldRight
-  (\x acc -> if p x then x :. acc else acc)
-  Nil
-  l
-
--- filter _ Nil = Nil
--- filter p (h :. t) =
---   let remainingList = filter p t
---       in if p h then h :. remainingList else remainingList
-
+    (\x -> ifThenElse (p x) (x :.) id)
+    -- (\x xs -> if p x then (x :. xs) else xs)
+    Nil
 -- | Append two lists to a new list.
 --
 -- >>> (1 :. 2 :. 3 :. Nil) ++ (4 :. 5 :. 6 :. Nil)
@@ -206,28 +180,9 @@ filter p l =
   List a
   -> List a
   -> List a
-
-
-(++) =  flip (foldRight (:.))
-
--- (++) l1 l2 =
---   foldRight
---   (:.)
---   l2
---   l1
-
--- (++) l1 l2 =
---   foldRight
---   (\x acc -> x :. acc)
---   l2
---   l1
-
--- (++) Nil l = l
--- (++) l Nil = l
--- (++) (h1 :. t1) l2 = h1 :. (t1 ++ l2)
+(++) = flip $ foldRight (:.)
 
 infixr 5 ++
-
 -- | Flatten a list of lists to a list.
 --
 -- >>> flatten ((1 :. 2 :. 3 :. Nil) :. (4 :. 5 :. 6 :. Nil) :. (7 :. 8 :. 9 :. Nil) :. Nil)
@@ -243,16 +198,8 @@ flatten ::
   -> List a
 flatten =
   foldRight
-  (++)
-  Nil
-
--- flatten =
---   foldRight
---   (\x acc -> x ++ acc )
---   Nil
-
--- flatten Nil = Nil
--- flatten (h :. t) = h ++ flatten t
+    (++)
+    Nil
 
 -- | Map a function then flatten to a list.
 --
@@ -268,10 +215,7 @@ flatMap ::
   (a -> List b)
   -> List a
   -> List b
-flatMap f l = flatten $ map f l
-
--- flatMap _ Nil = Nil
--- flatMap f (h :. t) = f h ++ flatMap f t
+flatMap f = flatten . (map f)
 
 -- | Flatten a list of lists to a list (again).
 -- HOWEVER, this time use the /flatMap/ function that you just wrote.
@@ -281,7 +225,6 @@ flattenAgain ::
   List (List a)
   -> List a
 flattenAgain = flatMap id
-
 -- | Convert a list of optional values to an optional list of values.
 --
 -- * If the list contains all `Full` values,
@@ -307,8 +250,12 @@ flattenAgain = flatMap id
 seqOptional ::
   List (Optional a)
   -> Optional (List a)
-seqOptional =
-  error "todo: Course.List#seqOptional"
+seqOptional Nil = Full Nil
+seqOptional (Empty :. _) = Empty
+seqOptional ((Full a) :. t) =
+  case seqOptional t of
+    Empty -> Empty
+    Full t' -> Full (a :. t')
 
 -- | Find the first element in the list matching the predicate.
 --
@@ -330,9 +277,8 @@ find ::
   (a -> Bool)
   -> List a
   -> Optional a
-find =
-  error "todo: Course.List#find"
-
+find p =
+  headOr Empty . map Full . filter p
 -- | Determine if the length of the given list is greater than 4.
 --
 -- >>> lengthGT4 (1 :. 3 :. 5 :. Nil)
@@ -349,23 +295,8 @@ find =
 lengthGT4 ::
   List a
   -> Bool
-lengthGT4 l =
-  let
-    helperFun Nil len = len > 4
-    helperFun (_ :. xs) lengthSoFar =
-      if lengthSoFar > 4
-      then True
-      else helperFun xs (lengthSoFar+1)
-  in
-    helperFun l 0
-
--- lengthGT4 Nil = False
--- lengthGT4 (_ :. Nil) = False
--- lengthGT4 (_ :. _ :. Nil) = False
--- lengthGT4 (_ :. _ :. _ :. Nil) = False
--- lengthGT4 (_ :. _ :. _ :. _ :. Nil) = False
--- lengthGT4 _ = True
-
+lengthGT4 =
+  (> 4) . length . take 5
 -- | Reverse a list.
 --
 -- >>> reverse Nil
@@ -380,7 +311,11 @@ lengthGT4 l =
 reverse ::
   List a
   -> List a
-reverse = foldLeft (flip (:.)) Nil
+reverse =
+  foldLeft
+    (flip (:.))
+    Nil
+
 -- | Produce an infinite `List` that seeds with the given value at its head,
 -- then runs the given function for subsequent elements
 --
@@ -407,9 +342,7 @@ produce f x = x :. produce f (f x)
 notReverse ::
   List a
   -> List a
-notReverse =
-  error "todo: Is it even possible?"
-
+notReverse = id
 ---- End of list exercises
 
 largeList ::
