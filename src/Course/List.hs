@@ -178,10 +178,17 @@ filter ::
   (a -> Bool)
   -> List a
   -> List a
-filter _ Nil = Nil
-filter p (h :. t) =
-  let remainingList = filter p t
-      in if p h then h :. remainingList else remainingList
+
+filter p l =
+  foldRight
+  (\x acc -> if p x then x :. acc else acc)
+  Nil
+  l
+
+-- filter _ Nil = Nil
+-- filter p (h :. t) =
+--   let remainingList = filter p t
+--       in if p h then h :. remainingList else remainingList
 
 -- | Append two lists to a new list.
 --
@@ -199,9 +206,25 @@ filter p (h :. t) =
   List a
   -> List a
   -> List a
-(++) Nil l = l
-(++) l Nil = l
-(++) (h1 :. t1) l2 = h1 :. (t1 ++ l2)
+
+
+(++) =  flip (foldRight (:.))
+
+-- (++) l1 l2 =
+--   foldRight
+--   (:.)
+--   l2
+--   l1
+
+-- (++) l1 l2 =
+--   foldRight
+--   (\x acc -> x :. acc)
+--   l2
+--   l1
+
+-- (++) Nil l = l
+-- (++) l Nil = l
+-- (++) (h1 :. t1) l2 = h1 :. (t1 ++ l2)
 
 infixr 5 ++
 
@@ -218,8 +241,18 @@ infixr 5 ++
 flatten ::
   List (List a)
   -> List a
-flatten Nil = Nil
-flatten (h :. t) = h ++ flatten t
+flatten =
+  foldRight
+  (++)
+  Nil
+
+-- flatten =
+--   foldRight
+--   (\x acc -> x ++ acc )
+--   Nil
+
+-- flatten Nil = Nil
+-- flatten (h :. t) = h ++ flatten t
 
 -- | Map a function then flatten to a list.
 --
@@ -235,8 +268,10 @@ flatMap ::
   (a -> List b)
   -> List a
   -> List b
-flatMap _ Nil = Nil
-flatMap f (h :. t) = f h ++ flatMap f t
+flatMap f l = flatten $ map f l
+
+-- flatMap _ Nil = Nil
+-- flatMap f (h :. t) = f h ++ flatMap f t
 
 -- | Flatten a list of lists to a list (again).
 -- HOWEVER, this time use the /flatMap/ function that you just wrote.
@@ -245,7 +280,7 @@ flatMap f (h :. t) = f h ++ flatMap f t
 flattenAgain ::
   List (List a)
   -> List a
-flattenAgain = flatten
+flattenAgain = flatMap id
 
 -- | Convert a list of optional values to an optional list of values.
 --
@@ -314,8 +349,22 @@ find =
 lengthGT4 ::
   List a
   -> Bool
-lengthGT4 =
-  error "todo: Course.List#lengthGT4"
+lengthGT4 l =
+  let
+    helperFun Nil len = len > 4
+    helperFun (_ :. xs) lengthSoFar =
+      if lengthSoFar > 4
+      then True
+      else helperFun xs (lengthSoFar+1)
+  in
+    helperFun l 0
+
+-- lengthGT4 Nil = False
+-- lengthGT4 (_ :. Nil) = False
+-- lengthGT4 (_ :. _ :. Nil) = False
+-- lengthGT4 (_ :. _ :. _ :. Nil) = False
+-- lengthGT4 (_ :. _ :. _ :. _ :. Nil) = False
+-- lengthGT4 _ = True
 
 -- | Reverse a list.
 --
@@ -331,9 +380,7 @@ lengthGT4 =
 reverse ::
   List a
   -> List a
-reverse =
-  error "todo: Course.List#reverse"
-
+reverse = foldLeft (flip (:.)) Nil
 -- | Produce an infinite `List` that seeds with the given value at its head,
 -- then runs the given function for subsequent elements
 --
