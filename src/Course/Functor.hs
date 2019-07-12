@@ -41,8 +41,8 @@ instance Functor ExactlyOne where
     (a -> b)
     -> ExactlyOne a
     -> ExactlyOne b
-  (<$>) f (ExactlyOne a) = ExactlyOne (f a)
-
+  (<$>) =
+    mapExactlyOne
 -- | Maps a function on the List functor.
 --
 -- >>> (+1) <$> Nil
@@ -69,8 +69,8 @@ instance Functor Optional where
     (a -> b)
     -> Optional a
     -> Optional b
-  (<$>) _ Empty = Empty
-  (<$>) f (Full a) = Full (f a)
+  (<$>) =
+    mapOptional
 
 -- | Maps a function on the reader ((->) t) functor.
 --
@@ -116,7 +116,7 @@ void ::
   Functor f =>
   f a
   -> f ()
-void = (<$) () 
+void = (<$) ()
 -----------------------
 -- SUPPORT LIBRARIES --
 -----------------------
