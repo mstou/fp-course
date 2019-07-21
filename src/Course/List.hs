@@ -164,6 +164,7 @@ filter p =
     (\x -> ifThenElse (p x) (x :.) id)
     -- (\x xs -> if p x then (x :. xs) else xs)
     Nil
+
 -- | Append two lists to a new list.
 --
 -- >>> (1 :. 2 :. 3 :. Nil) ++ (4 :. 5 :. 6 :. Nil)
@@ -180,7 +181,8 @@ filter p =
   List a
   -> List a
   -> List a
-(++) = flip $ foldRight (:.)
+(++) =
+  flip $ foldRight (:.)
 
 infixr 5 ++
 -- | Flatten a list of lists to a list.
@@ -215,7 +217,8 @@ flatMap ::
   (a -> List b)
   -> List a
   -> List b
-flatMap f = flatten . (map f)
+flatMap f =
+  flatten . (map f)
 
 -- | Flatten a list of lists to a list (again).
 -- HOWEVER, this time use the /flatMap/ function that you just wrote.
@@ -224,7 +227,9 @@ flatMap f = flatten . (map f)
 flattenAgain ::
   List (List a)
   -> List a
-flattenAgain = flatMap id
+flattenAgain =
+  flatMap id
+
 -- | Convert a list of optional values to an optional list of values.
 --
 -- * If the list contains all `Full` values,
@@ -250,12 +255,13 @@ flattenAgain = flatMap id
 seqOptional ::
   List (Optional a)
   -> Optional (List a)
-seqOptional Nil = Full Nil
-seqOptional (Empty :. _) = Empty
-seqOptional ((Full a) :. t) =
-  case seqOptional t of
-    Empty -> Empty
-    Full t' -> Full (a :. t')
+seqOptional =
+    foldRight
+      (\x ->
+        case x of
+          (Full a) -> mapOptional (a:.)
+          Empty -> const Empty)
+      (Full Nil)
 
 -- | Find the first element in the list matching the predicate.
 --
@@ -279,6 +285,7 @@ find ::
   -> Optional a
 find p =
   headOr Empty . map Full . filter p
+
 -- | Determine if the length of the given list is greater than 4.
 --
 -- >>> lengthGT4 (1 :. 3 :. 5 :. Nil)
@@ -297,6 +304,7 @@ lengthGT4 ::
   -> Bool
 lengthGT4 =
   (> 4) . length . take 5
+
 -- | Reverse a list.
 --
 -- >>> reverse Nil

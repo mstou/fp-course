@@ -55,7 +55,8 @@ instance Functor List where
     (a -> b)
     -> List a
     -> List b
-  (<$>) = map
+  (<$>) =
+    map
 
 -- | Maps a function on the Optional functor.
 --
@@ -81,7 +82,8 @@ instance Functor ((->) t) where
     (a -> b)
     -> ((->) t a)
     -> ((->) t b)
-  (<$>)  = (.)
+  (<$>) =
+    (.)
 
 -- | Anonymous map. Maps a constant value on a functor.
 --
@@ -96,7 +98,8 @@ instance Functor ((->) t) where
   a
   -> f b
   -> f a
-(<$) = (<$>) . (const)
+(<$) =
+  (<$>) . (const)
 -- (<$) x = (<$>) (\ _ -> x)
 
 -- | Anonymous map producing unit value.
@@ -116,7 +119,8 @@ void ::
   Functor f =>
   f a
   -> f ()
-void = (<$) ()
+void =
+  (<$) ()
 -----------------------
 -- SUPPORT LIBRARIES --
 -----------------------

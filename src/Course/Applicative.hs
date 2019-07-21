@@ -70,7 +70,8 @@ instance Applicative List where
     List (a -> b)
     -> List a
     -> List b
-  (<*>) fs xs = flatten $ foldRight (\f acc -> (f <$> xs) :. acc) Nil fs
+  (<*>) fs xs =
+    flatten $ foldRight (\f acc -> (f <$> xs) :. acc) Nil fs
 
 -- | Insert into an Optional.
 --
@@ -154,7 +155,8 @@ lift2 ::
   -> f a
   -> f b
   -> f c
-lift2 f g h = f <$> g <*> h
+lift2 f x1 x2 =
+  f <$> x1 <*> x2
 
 -- | Apply a ternary function in the environment.
 -- /can be written using `lift2` and `(<*>)`./
@@ -186,7 +188,8 @@ lift3 ::
   -> f b
   -> f c
   -> f d
-lift3 f g h k = lift2 f g h <*> k
+lift3 f x1 x2 x3 =
+  lift2 f x1 x2 <*> x3
 
 -- | Apply a quaternary function in the environment.
 -- /can be written using `lift3` and `(<*>)`./
@@ -219,8 +222,8 @@ lift4 ::
   -> f c
   -> f d
   -> f e
-lift4 f g h k l =
-  lift3 f g h k <*> l
+lift4 f x1 x2 x3 x4 =
+  lift3 f x1 x2 x3 <*> x4
 
 -- | Apply a nullary function in the environment.
 lift0 ::

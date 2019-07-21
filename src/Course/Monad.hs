@@ -36,7 +36,8 @@ instance Monad ExactlyOne where
     (a -> ExactlyOne b)
     -> ExactlyOne a
     -> ExactlyOne b
-  (=<<) = bindExacltyOne
+  (=<<) =
+    bindExactlyOne
 
 -- | Binds a function on a List.
 --
@@ -47,7 +48,8 @@ instance Monad List where
     (a -> List b)
     -> List a
     -> List b
-  (=<<) = flatMap
+  (=<<) =
+    flatMap
 
 -- | Binds a function on an Optional.
 --
@@ -58,7 +60,8 @@ instance Monad Optional where
     (a -> Optional b)
     -> Optional a
     -> Optional b
-  (=<<) = bindOptional
+  (=<<) =
+    bindOptional
 
 -- | Binds a function on the reader ((->) t).
 --
@@ -69,7 +72,8 @@ instance Monad ((->) t) where
     (a -> ((->) t b))
     -> ((->) t a)
     -> ((->) t b)
-  (=<<) = (<*>) . flip
+  (=<<) =
+    (<*>) . flip
   -- (=<<) f g = \x ->  f (g x) x
 
 -- | Witness that all things with (=<<) and (<$>) also have (<*>).
@@ -108,7 +112,8 @@ instance Monad ((->) t) where
   f (a -> b)
   -> f a
   -> f b
-(<**>) = (<*>)
+(<**>) =
+  (<*>)
 
 infixl 4 <**>
 
@@ -129,7 +134,8 @@ join ::
   Monad f =>
   f (f a)
   -> f a
-join = (id =<<)
+join =
+  (id =<<)
 -- | Implement a flipped version of @(=<<)@, however, use only
 -- @join@ and @(<$>)@.
 -- Pronounced, bind flipped.
@@ -141,7 +147,8 @@ join = (id =<<)
   f a
   -> (a -> f b)
   -> f b
-(>>=) x f = join $ f <$> x
+(>>=) x f =
+  join $ f <$> x
 -- (>>=) = flip (=<<)
 
 infixl 1 >>=
@@ -157,7 +164,8 @@ infixl 1 >>=
   -> (a -> f b)
   -> a
   -> f c
-(<=<) f g x = f =<< g =<< pure x
+(<=<) f g x =
+  f =<< g =<< pure x
 -- (<=<) f g x = f =<< g x
 
 infixr 1 <=<
