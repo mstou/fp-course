@@ -18,12 +18,12 @@ import qualified Prelude as P((=<<))
 --
 -- * The law of associativity
 --   `∀f g x. g =<< (f =<< x) ≅ ((g =<<) . f) =<< x`
-class Applicative f => Monad f where
+class Applicative k => Monad k where
   -- Pronounced, bind.
   (=<<) ::
-    (a -> f b)
-    -> f a
-    -> f b
+    (a -> k b)
+    -> k a
+    -> k b
 
 infixr 1 =<<
 
@@ -108,10 +108,10 @@ instance Monad ((->) t) where
 -- >>> ((*) <**> (+2)) 3
 -- 15
 (<**>) ::
-  Monad f =>
-  f (a -> b)
-  -> f a
-  -> f b
+  Monad k =>
+  k (a -> b)
+  -> k a
+  -> k b
 (<**>) =
   (<*>)
 
@@ -131,9 +131,9 @@ infixl 4 <**>
 -- >>> join (+) 7
 -- 14
 join ::
-  Monad f =>
-  f (f a)
-  -> f a
+  Monad k =>
+  k (k a)
+  -> k a
 join =
   (id =<<)
 -- | Implement a flipped version of @(=<<)@, however, use only
@@ -159,9 +159,9 @@ infixl 1 >>=
 -- >>> ((\n -> n :. n :. Nil) <=< (\n -> n+1 :. n+2 :. Nil)) 1
 -- [2,2,3,3]
 (<=<) ::
-  Monad f =>
-  (b -> f c)
-  -> (a -> f b)
+  Monad k =>
+  (b -> k c)
+  -> (a -> k b)
   -> a
   -> f c
 (<=<) f g x =

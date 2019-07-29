@@ -87,6 +87,9 @@ toSpecialCharacter c =
 -- >>> parse jsonString "\" abc\""
 -- Result >< " abc"
 --
+-- >>> parse jsonString "\" abc\" "
+-- Result >< " abc"
+--
 -- >>> parse jsonString "\"abc\"def"
 -- Result >def< "abc"
 --
@@ -116,7 +119,14 @@ jsonString =
 --
 -- /Tip:/ Use @readFloats@.
 --
+-- /Optional:/ As an extra challenge, you may wish to support exponential notation
+-- as defined on http://json.org/
+-- This is not required.
+--
 -- >>> parse jsonNumber "234"
+-- Result >< 234 % 1
+--
+-- >>> parse jsonNumber "234 "
 -- Result >< 234 % 1
 --
 -- >>> parse jsonNumber "-234"

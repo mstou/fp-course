@@ -55,6 +55,7 @@ library
                       Course.Cheque
                       Course.Comonad
                       Course.Compose
+                      Course.Contravariant
                       Course.Core
                       Course.ExactlyOne
                       Course.Extend
@@ -67,7 +68,6 @@ library
                       Course.List
                       Course.ListZipper
                       Course.Monad
-                      Course.MonadTutorial
                       Course.MoreParser
                       Course.Optional
                       Course.Parser

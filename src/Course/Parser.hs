@@ -53,7 +53,7 @@ instance Functor ParseResult where
   f <$> Result i a =
     Result i (f a)
 
--- Function to determine is a parse result is an error.
+-- Function to determine whether this @ParseResult@ is an error.
 isErrorResult ::
   ParseResult a
   -> Bool
@@ -254,6 +254,18 @@ is =
 --   * The produced character is not a digit.
 --
 -- /Tip:/ Use the @satisfy@ and @Data.Char#isDigit@ functions.
+--
+-- >>> parse digit "9"
+-- Result >< '9'
+--
+-- >>> parse digit "123"
+-- Result >23< '1'
+--
+-- >>> isErrorResult (parse digit "")
+-- True
+--
+-- >>> isErrorResult (parse digit "hello")
+-- True
 digit ::
   Parser Char
 digit =
@@ -267,10 +279,41 @@ digit =
 --   * The produced character is not a space.
 --
 -- /Tip:/ Use the @satisfy@ and @Data.Char#isSpace@ functions.
+--
+-- >>> parse space " "
+-- Result >< ' '
+--
+-- >>> parse space "\n z"
+-- Result > z< '\n'
+--
+-- >>> isErrorResult (parse space "")
+-- True
+--
+-- >>> isErrorResult (parse space "a")
+-- True
 space ::
   Parser Char
 space =
   error "todo: Course.Parser#space"
+
+-- | Return a parser that conses the result of the first parser onto the result of
+-- the second. Pronounced "cons parser".
+--
+-- /Tip:/ Use @lift2@
+--
+-- >>> parse (character .:. valueParser Nil) "abc"
+-- Result >bc< "a"
+--
+-- >>> parse (digit .:. valueParser "hello") "321"
+-- Result >21< "3hello"
+(.:.) ::
+  Parser a
+  -> Parser (List a)
+  -> Parser (List a)
+(.:.) =
+  error "todo: Course.Parser#(:..)"
+
+infixr 5 .:.
 
 -- | Return a parser that continues producing a list of values from the given parser.
 --
