@@ -150,7 +150,7 @@ instance Applicative ((->) t) where
 -- >>> lift2 (+) length sum (listh [4,5,6])
 -- 18
 lift2 ::
-  Applicative k =>
+  Applicative f =>
   (a -> b -> c)
   -> f a
   -> f b
@@ -182,7 +182,7 @@ lift2 f x1 x2 =
 -- >>> lift3 (\a b c -> a + b + c) length sum product (listh [4,5,6])
 -- 138
 lift3 ::
-  Applicative k =>
+  Applicative f =>
   (a -> b -> c -> d)
   -> f a
   -> f b
@@ -215,7 +215,7 @@ lift3 f x1 x2 x3 =
 -- >>> lift4 (\a b c d -> a + b + c + d) length sum product (sum . filter even) (listh [4,5,6])
 -- 148
 lift4 ::
-  Applicative k =>
+  Applicative f =>
   (a -> b -> c -> d -> e)
   -> f a
   -> f b
@@ -244,10 +244,10 @@ lift0 =
 -- >>> lift1 (+1) (1 :. 2 :. 3 :. Nil)
 -- [2,3,4]
 lift1 ::
-  Applicative k =>
+  Applicative f =>
   (a -> b)
-  -> k a
-  -> k b
+  -> f a
+  -> f b
 lift1 =
   (<$>)
 
@@ -350,7 +350,7 @@ sequence =
 -- >>> replicateA 3 ('a' :. 'b' :. 'c' :. Nil)
 -- ["aaa","aab","aac","aba","abb","abc","aca","acb","acc","baa","bab","bac","bba","bbb","bbc","bca","bcb","bcc","caa","cab","cac","cba","cbb","cbc","cca","ccb","ccc"]
 replicateA ::
-  Applicative k =>
+  Applicative f =>
   Int
   -> f a
   -> f (List a)
@@ -378,8 +378,8 @@ replicateA  x =
 -- [[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3],[1,2,3]]
 --
 filtering ::
-  Applicative k =>
-  (a -> k Bool)
+  Applicative f =>
+  (a -> f Bool)
   -> List a
   -> f (List a)
 filtering p =

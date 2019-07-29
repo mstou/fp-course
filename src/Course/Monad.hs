@@ -147,9 +147,9 @@ join =
   f a
   -> (a -> f b)
   -> f b
-(>>=) x f =
-  join $ f <$> x
--- (>>=) = flip (=<<)
+-- (>>=) x f =
+--   join $ f <$> x
+(>>=) = flip (=<<)
 
 infixl 1 >>=
 
@@ -163,7 +163,7 @@ infixl 1 >>=
   (b -> k c)
   -> (a -> k b)
   -> a
-  -> f c
+  -> k c
 (<=<) f g x =
   f =<< g =<< pure x
 -- (<=<) f g x = f =<< g x
