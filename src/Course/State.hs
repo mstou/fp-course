@@ -165,6 +165,7 @@ firstRepeat ::
   -> Optional a
 firstRepeat l = eval (findM checkAndAdd l) S.empty
 
+checkAndAdd :: Ord a => a -> State (S.Set a) Bool
 checkAndAdd x =
   State
     (\s ->
@@ -184,6 +185,7 @@ distinct ::
   -> List a
 distinct l = eval (filtering checkIfExists l) S.empty
 
+checkIfExists :: Ord a => a -> State (S.Set a) Bool
 checkIfExists x =
   State
     (\s ->
@@ -220,5 +222,8 @@ isHappy x =
     1
     (firstRepeat (produce square x))
 
-square x = toInteger . sum $ map (\x -> x*x) (digits x)
+square :: Integer -> Integer
+square x = toInteger . sum $ map (\y -> y*y) (digits x)
+
+digits :: Integer -> List Int
 digits x = map (digitToInt) (show' x)
